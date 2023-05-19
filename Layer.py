@@ -51,6 +51,10 @@ class Layer:
         self.activation = activation
         self.shape = [x_size, y_size] # allows you to ask for the shape of the layer and its preceeding layer
 
+    def reset(self):
+        self.weights = (np.random.rand(self.shape[0], self.shape[1]) - 0.5)  # random weights between -0.5 and 0.5
+        self.bias = (np.random.rand(1, self.shape[1]) - 0.5)  # random biases between -0.5 and 1
+
     #forward_propagation takes the input of the previous layer and computes the output of this layer
     def forward_propagation(self, input):
         self.input = input
@@ -99,5 +103,5 @@ class Layer:
         self.bias -= learning_rate * dEdB
 
         return dEdX
-    
+
 

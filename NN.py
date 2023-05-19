@@ -22,7 +22,12 @@ class NN:
     # this adds a layer to the NN
     def addLayer(self, layer):
         self.layers.append(layer)
-    
+
+    # Resets weights and biases of all layers to a random value
+    def resetLayers(self):
+        for layer in self.layers:
+            layer.reset()
+
     # The next function predicts the outcome for a NN for a an arbitrary number of samples
     def predict(self, input):
         N = len(input)
