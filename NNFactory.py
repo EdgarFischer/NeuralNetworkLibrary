@@ -11,8 +11,8 @@ This function creates a NN by random search. Either n_iter different NNs will be
 starts the last evaluation within ms_to_search milliseconds. Each parameter within the specified ranges will be chosen
 with an equal probability (uniform distribution for learning rate, randint distribution otherwise)
 
-:param X_train: Training data without labels
-:param y_train: according labels to the training data
+:param X: Training data without labels
+:param y: according labels to the training data
 :param range_learning_rate: range of the learning rate for the search in the format [min, max].
 :param range_epochs: range of number of epochs for the search in the format [min, max]. 
 :param range_layers: range of number of layers for the search in the format [min, max]. 
@@ -134,20 +134,23 @@ def convertNominalFeatures(X):
             if not bools[i][0][j]:
                 nom_indices.append(j)
     nom_indices_unique = np.sort(np.unique(np.array(nom_indices)))
+    print(nom_indices_unique)
     unique_noms = []
     for unique_ind in nom_indices_unique:
         unique_noms.append(np.unique(X[:, 0, unique_ind]).tolist())
-
-    running_index = 0
+    print(unique_noms)
     new_X = np.array([])
     for i in range(len(X)):
+        new_row = np.array([])
+        running_index = 0
         for j in range(len(X[0][0])):
             if j in nom_indices_unique:
                 noms = unique_noms[running_index]
                 running_index += 1
-                # TODO
+                new_row = np.append(new_row, [1 if (X[i][0][j] == nom) else 0 for nom in noms])
             else:
-                new_X = np.append(new_X, X[i])
+                new_row = np.append(new_row, X[i][0][j])
+        new_X = np.append(new_X, [[new_row]])
 
     return new_X
 

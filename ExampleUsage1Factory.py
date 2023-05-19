@@ -17,8 +17,11 @@ net = NNFactory.createNNByRandomizedSearch(X=x_train, y=y_train,
                                      act_fn_output=['relu'],
                                      cv=KFold(n_splits=2),
                                      n_iter=5,
-                                     print_interval=100,
+                                     print_interval=1000000,
                                      verbose=2)
+
+# len(net.layers) ... number of layers
+# net.layers[0].shape ... shape of layer 1
 
 print(net.predict(x_train))
 
