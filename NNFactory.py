@@ -111,11 +111,47 @@ def createNNByRandomizedSearchWithNominalFeatures(X, y, range_learning_rate, ran
     X = convertNominalFeatures(X)
     return NNFactory.createNNByRandomizedSearch(X, y, range_learning_rate, range_epochs, range_layers, layer_size_ranges, act_fn_deep, act_fn_output, cv, n_iter, s_to_search, print_interval, verbose)
 
+"""
+This function converts non-numerical features in the dataset each to a set of one-hot-encoded binary features and returns
+the resulting dataset.
+
+:param X: dataset. Must have equal number of values in each row (well formed)
+:returns X if X only contains numerical features, otherwise, if X has n columns, a dataset with n + sum(m[i]-1) columns, whereas
+         there are i columns with non-numeric values and m[i] is the number if distinct non-numeric values in ith non-numeric column. 
+"""
 @staticmethod
 def convertNominalFeatures(X):
-    # TODO
-    return X
+    bools = None
+    try:
+        bools = np.char.isnumeric(X)
+    except TypeError:
+        # No non-numerical features in there!
+        return X
 
+    nom_indices = []
+    for i in range(len(bools)):
+        for j in range(len(bools[0][0])):
+            if not bools[i][0][j]:
+                nom_indices.append(j)
+    nom_indices_unique = np.sort(np.unique(np.array(nom_indices)))
+    unique_noms = []
+    for unique_ind in nom_indices_unique:
+        unique_noms.append(np.unique(X[:, 0, unique_ind]).tolist())
+
+    running_index = 0
+    new_X = np.array([])
+    for i in range(len(X)):
+        for j in range(len(X[0][0])):
+            if j in nom_indices_unique:
+                noms = unique_noms[running_index]
+                running_index += 1
+                # TODO
+            else:
+                new_X = np.append(new_X, X[i])
+
+    return new_X
+
+# Helper that returns the MSE for two sets of labels. Is used to score the CV-folds in the randomized search
 @staticmethod
 def getMSEForPredictions(y_pred, y_true):
     MSE = 0  # Mean squared error
