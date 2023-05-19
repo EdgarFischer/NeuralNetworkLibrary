@@ -93,7 +93,7 @@ def createNNByRandomizedSearch(X, y, range_learning_rate, range_epochs, range_la
         # If we have found a new best network, then reset it, train it with the entire training data, and save it for later return
         if average_mse < best_mse:
             net.resetLayers()
-            net.Train(X_fold, y_fold, epochs=epochs, learning_rate=learning_rate, Print=print_interval)
+            net.Train(X, y, epochs=epochs, learning_rate=learning_rate, Print=print_interval)
             best_network = net
             best_mse = average_mse
 
@@ -106,53 +106,58 @@ def createNNByRandomizedSearch(X, y, range_learning_rate, range_epochs, range_la
 
     return best_network
 
-@staticmethod
-def createNNByRandomizedSearchWithNominalFeatures(X, y, range_learning_rate, range_epochs, range_layers, layer_size_ranges, act_fn_deep, act_fn_output, cv, n_iter=None, s_to_search=None, print_interval=10, verbose=1):
-    X = convertNominalFeatures(X)
-    return NNFactory.createNNByRandomizedSearch(X, y, range_learning_rate, range_epochs, range_layers, layer_size_ranges, act_fn_deep, act_fn_output, cv, n_iter, s_to_search, print_interval, verbose)
 
 """
 This function converts non-numerical features in the dataset each to a set of one-hot-encoded binary features and returns
 the resulting dataset.
 
-:param X: dataset. Must have equal number of values in each row (well formed)
-:returns X if X only contains numerical features, otherwise, if X has n columns, a dataset with n + sum(m[i]-1) columns, whereas
-         there are i columns with non-numeric values and m[i] is the number if distinct non-numeric values in ith non-numeric column. 
+:param X_ref: the dataset to use as a reference. From this dataset we find out where the nominal attributes are and how many distinct values each attribute has
+:param X_toconvert: the dataset to convert (encode). Must have the same shape as X_ref
+:returns X_toconvert if X_toconvert or X_ref only contain numerical features, otherwise, if X has n columns, a dataset with n + sum(m[i]-1) columns, whereas
+         for each non-numeric column (there are i of them), m[i] is the number if distinct non-numeric values in the ith non-numeric column. 
 """
 @staticmethod
-def convertNominalFeatures(X):
+def convertNominalFeatures(X_ref, X_toconvert):
     bools = None
     try:
-        bools = np.char.isnumeric(X)
+        np.char.isnumeric(X_toconvert)
+        bools = np.char.isnumeric(X_ref)
     except TypeError:
         # No non-numerical features in there!
-        return X
+        return X_toconvert
 
+    # Find the nominal attributes in the reference dataset and prepare everything so X_toconvert can be encoded
+    # Find out at what column indices there are nominal attributes and sort it
     nom_indices = []
     for i in range(len(bools)):
         for j in range(len(bools[0][0])):
             if not bools[i][0][j]:
                 nom_indices.append(j)
     nom_indices_unique = np.sort(np.unique(np.array(nom_indices)))
-    print(nom_indices_unique)
+    # In the same order as the column indices, create an 2-dim array containing the distinct nominal values for each attribute
     unique_noms = []
     for unique_ind in nom_indices_unique:
-        unique_noms.append(np.unique(X[:, 0, unique_ind]).tolist())
-    print(unique_noms)
-    new_X = np.array([])
-    for i in range(len(X)):
+        unique_noms.append(np.unique(X_ref[:, 0, unique_ind]).tolist())
+
+    # Now encode the dataset to convert accordingly
+    new_X = None
+    for i in range(len(X_toconvert)):
         new_row = np.array([])
         running_index = 0
-        for j in range(len(X[0][0])):
+        for j in range(len(X_toconvert[0][0])):
             if j in nom_indices_unique:
                 noms = unique_noms[running_index]
                 running_index += 1
-                new_row = np.append(new_row, [1 if (X[i][0][j] == nom) else 0 for nom in noms])
+                new_row = np.append(new_row, [1 if (X_toconvert[i][0][j] == nom) else 0 for nom in noms])
             else:
-                new_row = np.append(new_row, X[i][0][j])
-        new_X = np.append(new_X, [[new_row]])
+                new_row = np.append(new_row, X_toconvert[i][0][j])
+        if new_X is None:
+            new_X = np.array([[new_row]])
+        else:
+            new_X = np.append(new_X, [[new_row]], axis=0)
 
     return new_X
+
 
 # Helper that returns the MSE for two sets of labels. Is used to score the CV-folds in the randomized search
 @staticmethod
