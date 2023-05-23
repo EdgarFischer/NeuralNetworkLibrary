@@ -14,7 +14,3 @@ net.addLayer(Layer(3, 1, 'relu'))  # since the output layer has values between -
 net.Train(x_train, y_train, epochs=1000, learning_rate=0.1, Print=10)
 
 print(net.predict(x_train))
-
-
-
-

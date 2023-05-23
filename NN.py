@@ -30,13 +30,14 @@ class NN:
 
     # The next function predicts the outcome for a NN for a an arbitrary number of samples
     def predict(self, input):
-        N = len(input)
+        input_array = np.array(input)
+        N = len(input_array)
 
         prediction = []
         # go through all samples
         for i in range(N):
             # forward propagation
-            output = input[i]
+            output = input_array[i]
             for layer in self.layers:
                 output = layer.forward_propagation(output)
             prediction.append(output)

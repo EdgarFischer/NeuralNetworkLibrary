@@ -80,6 +80,7 @@ class Layer:
     def backward_propagation(self, dEdY, learning_rate):
         output = np.dot(self.input, self.weights) + self.bias # this would be the output of this layer WITHOUT activation function
         # First I only back propagate the derivative w.r.t. activation function, not that the argument of the derivative is output
+        
         if self.activation == 'None':
             dEdY = dEdY
         elif self.activation == 'sigmoid':
@@ -97,10 +98,14 @@ class Layer:
         dEdW = np.dot(np.transpose(self.input), dEdY)                 #np.dot(np.transpose(self.input), dEdY)
         dEdB = dEdY
         dEdX = np.dot(dEdY, np.transpose(self.weights))
+        
 
         # update parameters
-        self.weights -= learning_rate * dEdW
-        self.bias -= learning_rate * dEdB
+        # self.weights -= learning_rate * dEdW
+        # self.bias -= learning_rate * dEdB
+        # code update (Maciej)
+        self.weights -= learning_rate * dEdW.astype('float64')
+        self.bias -= learning_rate * dEdB.astype('float64')
 
         return dEdX
 
