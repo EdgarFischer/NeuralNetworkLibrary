@@ -44,12 +44,18 @@ class Layer:
 
 
     def __init__(self, x_size, y_size, activation):  # inialize layer with random weights
-        self.weights = (np.random.rand(x_size, y_size) - 0.5)   # random weights between -0.5 and 0.5
-        self.bias = (np.random.rand(1, y_size) - 0.5) # random biases between -0.5 and 1
+        #self.weights = (np.random.rand(x_size, y_size) - 0.5)   # random weights between -0.5 and 0.5
+        #self.bias = (np.random.rand(1, y_size) - 0.5) # random biases between -0.5 and 1
+        self.bias = np.zeros((1, y_size)) # initial biases are 0
         self.input = None    # a layer has information about the values that came from the previous layer
         self.output = None   # as well as information about its own values
         self.activation = activation
         self.shape = [x_size, y_size] # allows you to ask for the shape of the layer and its preceeding layer
+        if activation != "relu":
+            self.weights = np.random.normal(loc=0, scale=1/np.sqrt(x_size), size=(x_size, y_size)) # this is Xavier initializatin
+        else:
+            self.weights = np.random.normal(loc=0, scale=np.sqrt(2/x_size), size=(x_size, y_size)) # this is he initlaization
+
 
     def reset(self):
         self.weights = (np.random.rand(self.shape[0], self.shape[1]) - 0.5)  # random weights between -0.5 and 0.5

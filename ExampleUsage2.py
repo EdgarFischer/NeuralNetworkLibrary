@@ -14,7 +14,7 @@ net = NN()
 net.addLayer(Layer(3, 5, 'tanh'))
 net.addLayer(Layer(5, 2, 'None')) # since the output layer has values larger than 1, don't use an activation function here!
 
-net.Train(x_train, y_train, epochs=1000, learning_rate=0.1, Print=500)
+net.Train(x_train, y_train, epochs=1000, learning_rate=0.1, Print=10)
 
 predictions = net.predict(x_train)
 print(predictions)
