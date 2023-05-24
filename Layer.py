@@ -58,8 +58,11 @@ class Layer:
 
 
     def reset(self):
-        self.weights = (np.random.rand(self.shape[0], self.shape[1]) - 0.5)  # random weights between -0.5 and 0.5
-        self.bias = (np.random.rand(1, self.shape[1]) - 0.5)  # random biases between -0.5 and 1
+        if self.activation != "relu":
+            self.weights = np.random.normal(loc=0, scale=1/np.sqrt(self.shape[0]), size=(self.shape[0], self.shape[1])) # this is Xavier initializatin
+        else:
+            self.weights = np.random.normal(loc=0, scale=np.sqrt(2/self.shape[0]), size=(self.shape[0], self.shape[1])) # this is he initlaization
+        self.bias = np.zeros((1, self.shape[1]))  # initial biases are 0
 
     #forward_propagation takes the input of the previous layer and computes the output of this layer
     def forward_propagation(self, input):
