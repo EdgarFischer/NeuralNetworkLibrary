@@ -1,10 +1,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import time
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
+from sklearn.neighbors import KNeighborsClassifier
 
 # Import the custom neural network implementation
 from NN import NN
@@ -54,10 +56,10 @@ X_test_scaled = X_test_encoded.copy()
 X_train_scaled[numerical_columns] = scaler.fit_transform(X_train_encoded[numerical_columns])
 X_test_scaled[numerical_columns] = scaler.transform(X_test_encoded[numerical_columns])
 
-X_train_scaled = X_train_scaled.astype(np.float32).values  # Convert to numpy array
-y_train = y_train.astype(np.int32).values  # Convert to numpy array
-X_test_scaled = X_test_scaled.astype(np.float32).values  # Convert to numpy array
-y_test = y_test.astype(np.int32).values  # Convert to numpy array
+X_train_scaled = np.array(X_train_scaled).astype(np.float32)
+y_train = np.array(y_train).astype(np.int32)
+X_test_scaled = np.array(X_test_scaled).astype(np.float32)
+y_test = np.array(y_test).astype(np.int32)
 
 # Reshape the input data
 X_train_reshaped = X_train_scaled.reshape(-1, 1, X_train_scaled.shape[1])
@@ -69,17 +71,19 @@ num_instances = X_train_reshaped.shape[0]
 print("Number of features:", num_features)
 print("Number of instances:", num_instances)
 
-# Create the KEras model
+# Create the Keras model
 keras_model = Sequential()
 keras_model.add(Dense(100, activation='relu', input_shape=(num_features,)))
 keras_model.add(Dense(50, activation='relu'))
 keras_model.add(Dense(1, activation='sigmoid'))
 
 # Compile the Keras model
-keras_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+keras_model.compile(optimizer='sgd', loss='binary_crossentropy', metrics=['accuracy'])
 
 # Train the Keras model
-keras_history = keras_model.fit(X_train_scaled, y_train, epochs=100, batch_size=64, verbose=1)
+start_time = time.time()
+keras_history = keras_model.fit(X_train_scaled, y_train, epochs=100, batch_size=1, verbose=1)
+runtime_keras = time.time() - start_time
 
 # Evaluate the Keras model on the test set
 keras_loss, keras_accuracy = keras_model.evaluate(X_test_scaled, y_test)
@@ -93,31 +97,43 @@ custom_model.addLayer(Layer(100, 50, activation='relu'))
 custom_model.addLayer(Layer(50, 1, activation='sigmoid'))
 
 # Train the custom neural network model
-custom_model.Train(X_train_reshaped, y_train, epochs=100, learning_rate=0.01, Print=10)
+start_time = time.time()
+custom_model.Train(X_train_reshaped, y_train, epochs=100, learning_rate=0.01, Print=1)
+runtime_custom = time.time() - start_time
 
 # Evaluate the custom neural network model on the test set
 custom_predictions = custom_model.predict(X_test_reshaped)
-#custom_accuracy = np.mean((np.array(custom_predictions) > 0.5) == y_test)
 custom_accuracy = np.mean((np.array(custom_predictions) > 0.5) == y_test.reshape(-1, 1, 1))
 print("Custom Neural Network - Test Accuracy:", custom_accuracy)
 
-# Convert Keras predictions to a DataFrame
-keras_df_predictions = pd.DataFrame({'Actual': y_test.ravel(), 'Prediction': keras_model.predict(X_test_scaled).ravel()})
-print("Keras Model Predictions:")
-print(keras_df_predictions)
+# Create the KNN model
+knn_model = KNeighborsClassifier(n_neighbors=5)
 
-# Convert custom neural network predictions to a DataFrame
-custom_df_predictions = pd.DataFrame({'Actual': y_test.ravel(), 'Prediction': np.array(custom_predictions).ravel()})
-print("Custom Neural Network Predictions:")
-print(custom_df_predictions)
+# Fit the KNN model
+start_time = time.time()
+knn_model.fit(X_train_scaled, y_train)
+runtime_knn = time.time() - start_time
 
-# Create a bar chart comparing the accuracy of the two models
-models = ['Keras', 'Custom Neural Network']
-accuracies = [keras_accuracy, custom_accuracy]
+# Evaluate the KNN model on the test set
+knn_accuracy = knn_model.score(X_test_scaled, y_test)
+print("KNN Model - Test Accuracy:", knn_accuracy)
+
+# Create a bar chart comparing the accuracy of the models
+models = ['Keras', 'Custom Neural Network', 'KNN']
+accuracies = [keras_accuracy, custom_accuracy, knn_accuracy]
+
+# Add runtimes to the list
+runtimes = [runtime_keras, runtime_custom, runtime_knn]
 
 plt.bar(models, accuracies)
 plt.xlabel('Models')
 plt.ylabel('Accuracy')
-plt.title('Comparison of Model Accuracies: Keras vs. Custom Neural Network')
-plt.savefig('./results/accuracy_comparison_coupon.png')
+plt.title('Comparison of Model Accuracies: Keras vs. Custom Neural Network vs. KNN')
+plt.ylim(0, 1)
+
+# Add exact values and runtimes on top of each bar
+for i, (v, r) in enumerate(zip(accuracies, runtimes)):
+    plt.text(i, v, f"Acc: {round(v, 4)}\nRuntime: {round(r, 2)}s", ha='center', va='bottom')
+
+plt.savefig('./results/accuracy_runtime_comparison_coupon.png')
 plt.show()
