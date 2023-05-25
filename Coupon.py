@@ -93,11 +93,12 @@ custom_model.addLayer(Layer(100, 50, activation='relu'))
 custom_model.addLayer(Layer(50, 1, activation='sigmoid'))
 
 # Train the custom neural network model
-custom_model.Train(X_train_reshaped, y_train, epochs=100, learning_rate=0.001, Print=10)
+custom_model.Train(X_train_reshaped, y_train, epochs=100, learning_rate=0.01, Print=10)
 
 # Evaluate the custom neural network model on the test set
 custom_predictions = custom_model.predict(X_test_reshaped)
-custom_accuracy = np.mean((np.array(custom_predictions) > 0.5) == y_test)
+#custom_accuracy = np.mean((np.array(custom_predictions) > 0.5) == y_test)
+custom_accuracy = np.mean((np.array(custom_predictions) > 0.5) == y_test.reshape(-1, 1, 1))
 print("Custom Neural Network - Test Accuracy:", custom_accuracy)
 
 # Convert Keras predictions to a DataFrame
