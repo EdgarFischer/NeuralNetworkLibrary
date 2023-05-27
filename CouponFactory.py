@@ -78,13 +78,13 @@ print("Number of features:", num_features)
 print("Number of instances:", num_instances)
 
 # Set custom LR for SGD optimizer to match the one from Custom Implementation
-sgd_optimizer = SGD(learning_rate=0.01)
+sgd_optimizer = SGD(learning_rate=0.0010972247099740313)
 
 # Create the Keras model
 def create_keras_model():
     model = Sequential()
-    model.add(Dense(100, activation='relu', input_shape=(X_train_scaled.shape[1],)))
-    model.add(Dense(50, activation='relu'))
+    model.add(Dense(72, activation='relu', input_shape=(X_train_scaled.shape[1],)))
+    model.add(Dense(33, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(optimizer=sgd_optimizer, loss='binary_crossentropy', metrics=['accuracy'])
     return model
