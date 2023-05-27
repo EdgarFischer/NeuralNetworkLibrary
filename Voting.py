@@ -52,12 +52,6 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train_encoded)
 X_test_scaled = scaler.transform(X_test_encoded)
 
-# Convert to NumPy arrays
-X_train_scaled = np.array(X_train_scaled)
-y_train = np.array(y_train)
-X_test_scaled = np.array(X_test_scaled)
-y_test = np.array(y_test)
-
 # Reshape X_train and X_test to have shape (num_samples, 1, num_features)
 X_train_reshaped = X_train_scaled.reshape(-1, 1, X_train_scaled.shape[1])
 X_test_reshaped = X_test_scaled.reshape(-1, 1, X_test_scaled.shape[1])
@@ -93,7 +87,7 @@ runtime_custom = end_time_custom - start_time_custom
 # Evaluate the custom model
 predictions_custom = model_custom.predict(X_test_reshaped)
 rounded_predictions_custom = np.round(predictions_custom).astype(int)
-y_test_reshaped = y_test.reshape(rounded_predictions_custom.shape)
+y_test_reshaped = y_test.reshape()
 accuracy_custom = np.mean(rounded_predictions_custom == y_test_reshaped)
 print("Accuracy (Custom):", accuracy_custom)
 

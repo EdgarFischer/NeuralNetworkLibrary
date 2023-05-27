@@ -1,5 +1,8 @@
 import numpy as np
 
+random_state = 42
+np.random.seed(random_state)
+
 import NNFactory
 from Layer import Layer
 from NN import NN
