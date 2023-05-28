@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsRegressor
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
-from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.optimizers.legacy import SGD
 from Layer import Layer
 from NN import NN
 import time

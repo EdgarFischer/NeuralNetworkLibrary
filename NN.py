@@ -1,5 +1,6 @@
 import numpy as np
 from Layer import Layer
+import time
 
 class NN:
 
@@ -18,6 +19,7 @@ class NN:
     # a neural network (NN) is simply a collection of its layers, it is always created with 0 layers, and layers can be added with the addLayer function
     def __init__(self):
         self.layers = []
+        self.training_runtime = None
 
     # this adds a layer to the NN
     def addLayer(self, layer):
@@ -45,10 +47,16 @@ class NN:
         return prediction
 
     # Lastly, I want to use stochastic gradient decent to train the network
+
+    # Method to set the training runtime
+    def set_training_runtime(self, runtime):
+        self.training_runtime = runtime
    
     def Train(self, x_train, y_train, epochs, learning_rate, Print): #the Print variable means only print information after every Print number of epochs
         # number of training instances = N
         N = len(x_train)
+
+        starting_time = time.time()
 
         # loop for epochs
         for i in range(epochs):
@@ -78,6 +86,7 @@ class NN:
             if (i+1) % Print == 0:
                 print('epoch: ' + str(i+1)+ ', MSE: '+str(MSE))  #print('epoch %d/%d   MSE=%f' % (i+1, epochs, MSE))
 
-
-
+                
+            # Set the training runtime after training is complete
+            self.set_training_runtime(time.time() - starting_time)
 
