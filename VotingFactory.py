@@ -75,7 +75,7 @@ def build_keras_model():
     model.add(Dense(67, input_dim=X_train_scaled.shape[1], activation='tanh'))
     model.add(Dense(14, activation='tanh'))
     model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer=sgd_optimizer, metrics=['accuracy'])
     return model
 
 # Build the KerasClassifier
@@ -169,7 +169,6 @@ ax.set_title('CV Accuracy and Precision Comparison: Custom vs Keras vs KNN')
 ax.set_xticks(index + bar_width/2)
 ax.set_xticklabels(models)
 ax.set_ylim(0, 1)
-ax.legend()
 
 # Add exact values on top of each bar
 for i, (v, p, r) in enumerate(zip(accuracies, precisions, runtimes)):

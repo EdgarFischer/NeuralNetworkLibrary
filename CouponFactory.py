@@ -169,12 +169,11 @@ ax1.set_title('CV Accuracy and Recall Comparison: Custom vs Keras vs KNN')
 ax1.set_xticks(x)
 ax1.set_xticklabels(models)
 ax1.set_ylim(0, 1)
-ax1.legend()
 
 # Add exact values on top of each bar in the accuracy and recall subplot
-for i, (v1, v2) in enumerate(zip(accuracies, recalls)):
-    ax1.text(i - width/2, v1, f"Acc: {round(v1, 4)}", ha='center', va='bottom')
-    ax1.text(i + width/2, v2, f"Rec: {round(v2, 4)}", ha='center', va='bottom')
+for i, (v1, v2, r) in enumerate(zip(accuracies, recalls, runtimes)):
+    ax1.text(i - width/2, v1, f"Acc: {round(v1, 4)}\nTime: {round(r, 2)}s", ha='center', va='bottom')
+    ax1.text(i + width/2, v2, f"Rec: {round(v2, 4)}\nTime: {round(r, 2)}s", ha='center', va='bottom')
 
 plt.savefig('./results/crossval_acc_recall_runtime_comparison_coupon.png')
 plt.show()
